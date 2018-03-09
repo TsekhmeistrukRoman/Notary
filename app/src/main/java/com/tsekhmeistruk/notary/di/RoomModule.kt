@@ -1,7 +1,9 @@
 package com.tsekhmeistruk.notary.di
 
 import android.app.Application
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.persistence.room.Room
+import com.tsekhmeistruk.notary.util.ViewModelFactory
 import com.tsekhmeistruk.notary.data.source.NotesRepository
 import com.tsekhmeistruk.notary.data.source.local.NotesDao
 import com.tsekhmeistruk.notary.data.source.local.NotesDataBase
@@ -34,4 +36,10 @@ class RoomModule(val application: Application) {
     fun provideDatabase(): NotesDataBase = Room.databaseBuilder(
             application, NotesDataBase::class.java, "Notes.db")
             .build()
+
+    @Provides
+    @Singleton
+    fun provideViewModelFactory(notesRepository: NotesRepository): ViewModelProvider.Factory {
+        return ViewModelFactory(notesRepository)
+    }
 }
