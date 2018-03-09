@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorWhite"
-    tools:context="com.tsekhmeistruk.notary.addeditnote.AddEditFragment">
+    tools:context="com.tsekhmeistruk.notary.addeditnote.AddEditNoteFragment">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/view_pager"

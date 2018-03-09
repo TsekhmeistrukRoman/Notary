@@ -15,11 +15,11 @@ import java.util.*
 /**
  * A simple [Fragment] subclass.
  */
-class AddEditFragment : Fragment() {
+class AddEditNoteFragment : Fragment() {
 
     companion object {
-        fun newInstance(): AddEditFragment {
-            return AddEditFragment()
+        fun newInstance(): AddEditNoteFragment {
+            return AddEditNoteFragment()
         }
     }
 
