@@ -16,7 +16,7 @@ interface NotesDataSource {
 
     fun removeNote(noteId: String): Completable
 
-    fun updateNote(noteId: String): Completable
+    fun updateNote(note: Note): Completable
 
     fun addNote(note: Note): Completable
 }
