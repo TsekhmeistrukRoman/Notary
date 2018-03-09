@@ -9,7 +9,7 @@ import io.reactivex.Single
 /**
  * Created by Roman Tsekhmeistruk on 09.03.2018.
  */
-class NotesLocalDataSource private constructor(private val notesDao: NotesDao) : NotesDataSource {
+class NotesLocalDataSource(private val notesDao: NotesDao) : NotesDataSource {
 
     override fun getAllNotes(): Flowable<List<Note>> {
         return notesDao.getAllNotes()
