@@ -1,15 +1,11 @@
 package com.tsekhmeistruk.notary.notes
 
 import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.widget.Toast
 import com.tsekhmeistruk.notary.R
 import com.tsekhmeistruk.notary.addeditnote.AddEditNoteFragment
-import com.tsekhmeistruk.notary.util.BaseActivity
-import io.reactivex.android.schedulers.AndroidSchedulers
+import com.tsekhmeistruk.notary.widgets.util.BaseActivity
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_note_list.*
 import javax.inject.Inject
 

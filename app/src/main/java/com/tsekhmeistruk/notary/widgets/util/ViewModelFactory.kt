@@ -1,4 +1,4 @@
-package com.tsekhmeistruk.notary.util
+package com.tsekhmeistruk.notary.widgets.util
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider

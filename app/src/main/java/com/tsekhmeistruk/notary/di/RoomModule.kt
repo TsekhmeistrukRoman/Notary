@@ -7,7 +7,7 @@ import com.tsekhmeistruk.notary.data.source.NotesRepository
 import com.tsekhmeistruk.notary.data.source.local.NotesDao
 import com.tsekhmeistruk.notary.data.source.local.NotesDataBase
 import com.tsekhmeistruk.notary.data.source.local.NotesLocalDataSource
-import com.tsekhmeistruk.notary.util.ViewModelFactory
+import com.tsekhmeistruk.notary.widgets.util.ViewModelFactory
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

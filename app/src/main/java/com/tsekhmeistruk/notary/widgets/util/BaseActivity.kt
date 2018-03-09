@@ -1,4 +1,4 @@
-package com.tsekhmeistruk.notary.util
+package com.tsekhmeistruk.notary.widgets.util
 
 import android.content.Context
 import android.support.v4.app.Fragment

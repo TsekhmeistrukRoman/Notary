@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import com.tsekhmeistruk.notary.R
 import com.tsekhmeistruk.notary.data.Note
-import com.tsekhmeistruk.notary.util.BaseActivity
+import com.tsekhmeistruk.notary.widgets.util.BaseActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
