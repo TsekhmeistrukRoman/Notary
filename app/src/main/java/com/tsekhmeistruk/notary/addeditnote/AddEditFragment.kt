@@ -23,13 +23,11 @@ class AddEditFragment : Fragment() {
         }
     }
 
-    private lateinit var pagerAdapter: PagerAdapter
-
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val v = inflater!!.inflate(R.layout.fragment_add_edit, container, false)
 
-        pagerAdapter = DrawablePagerAdapter()
+        val pagerAdapter = DrawablePagerAdapter()
         v.view_pager.adapter = pagerAdapter
         v.page_indicator.setViewPager(v.view_pager)
         v.back.setOnClickListener { activity.onBackPressed() }
