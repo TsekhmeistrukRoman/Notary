@@ -3,6 +3,7 @@ package com.tsekhmeistruk.notary.data.source.local
 import android.arch.persistence.room.*
 import com.tsekhmeistruk.notary.data.Note
 import io.reactivex.Flowable
+import io.reactivex.Single
 
 /**
  * Created by Roman Tsekhmeistruk on 09.03.2018.
@@ -14,7 +15,7 @@ interface NotesDao {
     fun getAllNotes(): Flowable<List<Note>>
 
     @Query("SELECT * FROM Notes WHERE entryid = :noteId")
-    fun getNoteById(noteId: String): Note?
+    fun getNoteById(noteId: String): Single<Note>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertNote(note: Note)
