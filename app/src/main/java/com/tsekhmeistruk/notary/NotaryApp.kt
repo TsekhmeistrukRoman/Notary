@@ -23,5 +23,5 @@ class NotaryApp : Application() {
                 .build()
     }
 
-    fun getApplicationComponent(): ApplicationComponent = applicationComponent
+    fun applicationComponent(): ApplicationComponent = applicationComponent
 }
