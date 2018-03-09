@@ -15,13 +15,7 @@ import javax.inject.Singleton
  */
 
 @Module
-class RoomModule(application: Application) {
-
-    private val database: NotesDataBase = Room.databaseBuilder(
-            application,
-            NotesDataBase::class.java,
-            "Notes.db")
-            .build()
+class RoomModule(val application: Application) {
 
     @Provides
     @Singleton
@@ -31,13 +25,13 @@ class RoomModule(application: Application) {
 
     @Provides
     @Singleton
-    fun provideNotesDao(): NotesDao {
-        return database.noteDao()
+    fun provideNotesDao(dataBase: NotesDataBase): NotesDao {
+        return dataBase.noteDao()
     }
 
     @Provides
     @Singleton
-    fun provideDatabase(): NotesDataBase {
-        return database
-    }
+    fun provideDatabase(): NotesDataBase = Room.databaseBuilder(
+            application, NotesDataBase::class.java, "Notes.db")
+            .build()
 }
