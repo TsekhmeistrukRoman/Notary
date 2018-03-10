@@ -129,12 +129,13 @@ class AddEditNoteFragment : Fragment() {
             if (res != null) {
                 when (res.status) {
                     Status.LOADING -> {
-
+                        (activity as BaseActivity).showLoadingIndicator()
                     }
                     Status.ERROR -> {
                         Toast.makeText(context, getText(R.string.error), Toast.LENGTH_LONG).show()
                     }
                     Status.SUCCESS -> {
+                        (activity as BaseActivity).hideLoadingIndicator()
                         activity.onBackPressed()
                         interactionListener.onFragmentInteraction(isNoteExistent, res.data)
                     }

@@ -11,6 +11,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by Roman Tsekhmeistruk on 09.03.2018.
@@ -26,6 +27,8 @@ class NotesViewModule(private var notesRepository: NotesRepository) : ViewModel(
 
     fun getAllNotes() {
         compositeDisposable.add(notesRepository.getAllNotes()
+                .doOnSubscribe { postValueList(DataResource.loading(null)) }
+                .delay(1500, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ setValueList(DataResource.success(it)) },
@@ -40,6 +43,10 @@ class NotesViewModule(private var notesRepository: NotesRepository) : ViewModel(
         liveDataList.value = newValue
     }
 
+    private fun postValueList(newValue: DataResource<List<Note>>) {
+        liveDataList.postValue(newValue)
+    }
+
     @MainThread
     private fun setValueItem(newValue: DataResource<Note>) {
         if (!Objects.equals(liveDataList.value, newValue)) {
@@ -47,11 +54,19 @@ class NotesViewModule(private var notesRepository: NotesRepository) : ViewModel(
         }
     }
 
+    private fun postValueItem(newValue: DataResource<Note>) {
+        liveDataItem.postValue(newValue)
+    }
+
     @MainThread
     private fun setValueRemoved(newValue: DataResource<Note>) {
         if (!Objects.equals(liveDataRemoved.value, newValue)) {
             liveDataRemoved.value = newValue
         }
+    }
+
+    private fun postValueRemoved(newValue: DataResource<Note>) {
+        liveDataRemoved.postValue(newValue)
     }
 
     fun getLiveDataList(): MutableLiveData<DataResource<List<Note>>> {
@@ -68,6 +83,8 @@ class NotesViewModule(private var notesRepository: NotesRepository) : ViewModel(
 
     fun removeNoteFromDatabase(note: Note) {
         compositeDisposable.add(notesRepository.removeNote(note.id)
+                .doOnSubscribe { postValueRemoved(DataResource.loading(null)) }
+                .delay(1500, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ setValueRemoved(DataResource.success(note)) },
@@ -79,6 +96,8 @@ class NotesViewModule(private var notesRepository: NotesRepository) : ViewModel(
 
     fun updateNote(note: Note) {
         compositeDisposable.add(notesRepository.updateNote(note)
+                .doOnSubscribe { postValueItem(DataResource.loading(null)) }
+                .delay(1500, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ setValueItem(DataResource.success(note)) },

@@ -4,6 +4,7 @@ import android.content.Context
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.tsekhmeistruk.notary.NotaryApp
 import com.tsekhmeistruk.notary.R
@@ -42,6 +43,16 @@ abstract class BaseActivity : AppCompatActivity() {
             fragmentTransaction.addToBackStack(tag)
         }
         fragmentTransaction.commit()
+    }
+
+    fun showLoadingIndicator() {
+        findViewById<View>(R.id.progress_bar).visibility = View.VISIBLE
+        findViewById<View>(R.id.background).visibility = View.VISIBLE
+    }
+
+    fun hideLoadingIndicator() {
+        findViewById<View>(R.id.progress_bar).visibility = View.GONE
+        findViewById<View>(R.id.background).visibility = View.GONE
     }
 
     fun getAppComponent(): ApplicationComponent {

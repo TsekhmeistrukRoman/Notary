@@ -93,13 +93,15 @@ class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener, Ad
             if (res != null) {
                 when (res.status) {
                     Status.LOADING -> {
-
+                        showLoadingIndicator()
                     }
                     Status.ERROR -> {
+                        hideLoadingIndicator()
                         Toast.makeText(applicationContext, getText(R.string.error), Toast.LENGTH_LONG).show()
                         listAdapter.clearList()
                     }
                     Status.SUCCESS -> {
+                        hideLoadingIndicator()
                         listAdapter.clearList()
                         listAdapter.add(res.data as List<Note>)
                         swipe_container.isRefreshing = false
@@ -112,16 +114,20 @@ class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener, Ad
             if (res != null) {
                 when (res.status) {
                     Status.LOADING -> {
-
+                        showLoadingIndicator()
                     }
                     Status.ERROR -> {
+                        hideLoadingIndicator()
                         Toast.makeText(applicationContext, getText(R.string.error), Toast.LENGTH_LONG).show()
                     }
                     Status.SUCCESS -> {
-                        listAdapter.getItem(choosedNotePosition).update(res.data!!)
-                        listAdapter.notifyItemChanged(choosedNotePosition)
-                        choosedNotePosition = -1
-                        choosedNote = null
+                        hideLoadingIndicator()
+                        if (choosedNotePosition != -1) {
+                            listAdapter.getItem(choosedNotePosition).update(res.data!!)
+                            listAdapter.notifyItemChanged(choosedNotePosition)
+                            choosedNotePosition = -1
+                            choosedNote = null
+                        }
                     }
                 }
             }
@@ -131,12 +137,14 @@ class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener, Ad
             if (res != null) {
                 when (res.status) {
                     Status.LOADING -> {
-
+                        showLoadingIndicator()
                     }
                     Status.ERROR -> {
+                        hideLoadingIndicator()
                         Toast.makeText(applicationContext, getText(R.string.error), Toast.LENGTH_LONG).show()
                     }
                     Status.SUCCESS -> {
+                        hideLoadingIndicator()
                         val index = listAdapter.findNotePosition(res.data!!)
                         if (index != -1) {
                             listAdapter.removeItem(index)
