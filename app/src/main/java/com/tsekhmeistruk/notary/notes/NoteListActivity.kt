@@ -16,7 +16,7 @@ import com.tsekhmeistruk.notary.widgets.util.DataResource
 import kotlinx.android.synthetic.main.activity_note_list.*
 import javax.inject.Inject
 
-class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener {
+class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener, AddEditNoteFragment.OnFragmentInteractionListener {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -66,5 +66,15 @@ class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener {
         choosedNotePosition = position
 
         startFragment(AddEditNoteFragment.newInstance(true), true)
+    }
+
+    override fun onFragmentInteraction(wasAdded: Boolean, note: Note?) {
+        if (wasAdded) {
+            if (note != null) {
+                listAdapter.add(note)
+            }
+        } else {
+            listAdapter.removeItem(choosedNotePosition)
+        }
     }
 }

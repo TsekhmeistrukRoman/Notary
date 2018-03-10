@@ -1,5 +1,6 @@
 package com.tsekhmeistruk.notary.addeditnote
 
+import android.app.Activity
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -46,6 +47,9 @@ class AddEditNoteFragment : Fragment() {
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: AddEditNoteViewModel
 
+    private lateinit var interactionListener: OnFragmentInteractionListener
+    private var isNoteExistent: Boolean = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         retainInstance = true
@@ -78,6 +82,8 @@ class AddEditNoteFragment : Fragment() {
                 view?.done?.visibility = View.GONE
                 view?.title?.setText((activity as NoteListActivity).choosedNote.title)
                 view?.view_pager?.currentItem = (activity as NoteListActivity).choosedNote.pagerPosition
+
+                isNoteExistent = false
             }
         }
     }
@@ -97,10 +103,21 @@ class AddEditNoteFragment : Fragment() {
                     }
                     Status.SUCCESS -> {
                         activity.onBackPressed()
+                        interactionListener.onFragmentInteraction(isNoteExistent, res.data)
                     }
                 }
             }
         })
+    }
+
+    override fun onAttach(context: Activity?) {
+        super.onAttach(context)
+
+        try {
+            interactionListener = context as OnFragmentInteractionListener
+        } catch (e: ClassCastException) {
+            throw ClassCastException(context.toString() + " must implement OnFragmentInteractionListener")
+        }
     }
 
     private fun getDrawableResource(pagerItemPosition: Int): Int {
@@ -150,5 +167,9 @@ class AddEditNoteFragment : Fragment() {
         override fun isViewFromObject(view: View, `object`: Any): Boolean {
             return view === `object`
         }
+    }
+
+    interface OnFragmentInteractionListener {
+        fun onFragmentInteraction(wasAdded: Boolean, note: Note?)
     }
 }
