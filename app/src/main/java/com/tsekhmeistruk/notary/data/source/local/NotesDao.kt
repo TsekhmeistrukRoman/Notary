@@ -12,7 +12,7 @@ import io.reactivex.Single
 interface NotesDao {
 
     @Query("SELECT * FROM Notes")
-    fun getAllNotes(): Flowable<List<Note>>
+    fun getAllNotes(): Single<List<Note>>
 
     @Query("SELECT * FROM Notes WHERE entryid = :noteId")
     fun getNoteById(noteId: String): Single<Note>

@@ -11,7 +11,7 @@ import io.reactivex.Single
  */
 class NotesLocalDataSource(private val notesDao: NotesDao) : NotesDataSource {
 
-    override fun getAllNotes(): Flowable<List<Note>> {
+    override fun getAllNotes(): Single<List<Note>> {
         return notesDao.getAllNotes()
     }
 

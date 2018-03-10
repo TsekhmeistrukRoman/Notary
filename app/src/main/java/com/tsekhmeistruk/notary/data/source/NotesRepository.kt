@@ -11,7 +11,7 @@ import javax.inject.Inject
  */
 class NotesRepository @Inject constructor(private val notesLocalDataSource: NotesDataSource) : NotesDataSource {
 
-    override fun getAllNotes(): Flowable<List<Note>> {
+    override fun getAllNotes(): Single<List<Note>> {
         return notesLocalDataSource.getAllNotes()
     }
 

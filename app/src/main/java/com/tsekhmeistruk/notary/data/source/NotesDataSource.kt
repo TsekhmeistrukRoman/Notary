@@ -10,7 +10,7 @@ import io.reactivex.Single
  */
 interface NotesDataSource {
 
-    fun getAllNotes(): Flowable<List<Note>>
+    fun getAllNotes(): Single<List<Note>>
 
     fun getNoteById(noteId: String): Single<Note>
 
