@@ -37,9 +37,7 @@ class NotesViewModule(private var notesRepository: NotesRepository) : ViewModel(
 
     @MainThread
     private fun setValueList(newValue: DataResource<List<Note>>) {
-        if (!Objects.equals(liveDataList.value, newValue)) {
-            liveDataList.value = newValue
-        }
+        liveDataList.value = newValue
     }
 
     @MainThread

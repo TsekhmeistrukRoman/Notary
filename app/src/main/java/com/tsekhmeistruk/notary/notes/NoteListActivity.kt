@@ -18,6 +18,7 @@ import com.tsekhmeistruk.notary.widgets.util.DataResource
 import kotlinx.android.synthetic.main.activity_note_list.*
 import javax.inject.Inject
 
+
 class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener, AddEditNoteFragment.OnFragmentInteractionListener {
 
     @Inject
@@ -37,15 +38,53 @@ class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener, Ad
 
         add_button.setOnClickListener { startFragment(AddEditNoteFragment.newInstance(), true) }
 
-        listAdapter = NoteListAdapter(this)
-        note_list.layoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, false)
-        note_list.itemAnimator = DefaultItemAnimator()
-        note_list.adapter = listAdapter
-
-        val itemTouchHelper = ItemTouchHelper(createHelperCallback())
-        itemTouchHelper.attachToRecyclerView(note_list)
+        initNoteRecyclerView()
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(NotesViewModule::class.java)
+        initLiveData()
+
+        swipe_container.setOnRefreshListener(
+                {
+                    viewModel.getAllNotes()
+                }
+        )
+
+        viewModel.getAllNotes()
+    }
+
+    override fun onBackPressed() {
+        hideKeyboard()
+
+        val count = supportFragmentManager.backStackEntryCount
+        if (count != 0) {
+            if (choosedNotePosition != -1) {
+                if (choosedNote != listAdapter.getItem(choosedNotePosition)) {
+                    viewModel.updateNote(choosedNote!!)
+                }
+            }
+        }
+
+        super.onBackPressed()
+    }
+
+    override fun onNoteClick(position: Int) {
+        choosedNote = listAdapter.getItem(position).copy()
+        choosedNotePosition = position
+
+        startFragment(AddEditNoteFragment.newInstance(true), true)
+    }
+
+    override fun onFragmentInteraction(wasAdded: Boolean, note: Note?) {
+        if (wasAdded) {
+            if (note != null) {
+                listAdapter.add(note)
+            }
+        } else {
+            listAdapter.removeItem(choosedNotePosition)
+        }
+    }
+
+    private fun initLiveData() {
         viewModel.getLiveDataList().observe(this, android.arch.lifecycle.Observer<DataResource<List<Note>>> { res ->
             if (res != null) {
                 when (res.status) {
@@ -57,7 +96,9 @@ class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener, Ad
                         listAdapter.clearList()
                     }
                     Status.SUCCESS -> {
+                        listAdapter.clearList()
                         listAdapter.add(res.data as List<Note>)
+                        swipe_container.isRefreshing = false
                     }
                 }
             }
@@ -99,40 +140,16 @@ class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener, Ad
                 }
             }
         })
-
-        viewModel.getAllNotes()
     }
 
-    override fun onBackPressed() {
-        hideKeyboard()
+    private fun initNoteRecyclerView() {
+        listAdapter = NoteListAdapter(this)
+        note_list.layoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, false)
+        note_list.itemAnimator = DefaultItemAnimator()
+        note_list.adapter = listAdapter
 
-        val count = supportFragmentManager.backStackEntryCount
-        if (count != 0) {
-            if (choosedNotePosition != -1) {
-                if (choosedNote != listAdapter.getItem(choosedNotePosition)) {
-                    viewModel.updateNote(choosedNote!!)
-                }
-            }
-        }
-
-        super.onBackPressed()
-    }
-
-    override fun onNoteClick(position: Int) {
-        choosedNote = listAdapter.getItem(position).copy()
-        choosedNotePosition = position
-
-        startFragment(AddEditNoteFragment.newInstance(true), true)
-    }
-
-    override fun onFragmentInteraction(wasAdded: Boolean, note: Note?) {
-        if (wasAdded) {
-            if (note != null) {
-                listAdapter.add(note)
-            }
-        } else {
-            listAdapter.removeItem(choosedNotePosition)
-        }
+        val itemTouchHelper = ItemTouchHelper(createHelperCallback())
+        itemTouchHelper.attachToRecyclerView(note_list)
     }
 
     private fun createHelperCallback(): ItemTouchHelper.Callback {
