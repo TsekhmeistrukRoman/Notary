@@ -12,6 +12,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import com.tsekhmeistruk.notary.R
 import com.tsekhmeistruk.notary.data.Note
+import com.tsekhmeistruk.notary.notes.NoteListActivity
 import com.tsekhmeistruk.notary.widgets.Status
 import com.tsekhmeistruk.notary.widgets.util.BaseActivity
 import com.tsekhmeistruk.notary.widgets.util.DataResource
@@ -32,9 +33,9 @@ class AddEditNoteFragment : Fragment() {
             return AddEditNoteFragment()
         }
 
-        fun newInstance(note: Note): AddEditNoteFragment {
+        fun newInstance(isExistent: Boolean): AddEditNoteFragment {
             val bundle = Bundle()
-            bundle.putSerializable(passedNoteKey, note)
+            bundle.putBoolean(passedNoteKey, isExistent)
             val addEditFragment = AddEditNoteFragment()
             addEditFragment.arguments = bundle
             return addEditFragment
@@ -44,8 +45,6 @@ class AddEditNoteFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: AddEditNoteViewModel
-
-    private var passedNote: Note? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,12 +72,13 @@ class AddEditNoteFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         if (arguments != null) {
-            passedNote = arguments.get(passedNoteKey) as Note
-            view?.remove?.visibility = View.VISIBLE
-            view?.remove?.setOnClickListener { viewModel.removeNoteFromDatabase(passedNote as Note) }
-            view?.done?.visibility = View.GONE
-            view?.title?.setText((passedNote as Note).title)
-            view?.view_pager?.currentItem = (passedNote as Note).pagerPosition
+            if (arguments.getBoolean(passedNoteKey)) {
+                view?.remove?.visibility = View.VISIBLE
+                view?.remove?.setOnClickListener { viewModel.removeNoteFromDatabase((activity as NoteListActivity).choosedNote) }
+                view?.done?.visibility = View.GONE
+                view?.title?.setText((activity as NoteListActivity).choosedNote.title)
+                view?.view_pager?.currentItem = (activity as NoteListActivity).choosedNote.pagerPosition
+            }
         }
     }
 

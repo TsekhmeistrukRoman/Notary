@@ -24,6 +24,9 @@ class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener {
 
     private lateinit var listAdapter: NoteListAdapter
 
+    lateinit var choosedNote: Note
+    private var choosedNotePosition: Int = -1
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note_list)
@@ -59,6 +62,9 @@ class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener {
     }
 
     override fun onNoteClick(position: Int) {
-        startFragment(AddEditNoteFragment.newInstance(listAdapter.getItem(position)), true)
+        choosedNote = listAdapter.getItem(position)
+        choosedNotePosition = position
+
+        startFragment(AddEditNoteFragment.newInstance(true), true)
     }
 }
