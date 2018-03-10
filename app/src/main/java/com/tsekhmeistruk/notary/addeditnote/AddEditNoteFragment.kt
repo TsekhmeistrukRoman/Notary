@@ -65,8 +65,13 @@ class AddEditNoteFragment : Fragment() {
         v.page_indicator.setViewPager(v.view_pager)
         v.back.setOnClickListener { activity.onBackPressed() }
         v.done.setOnClickListener {
-            val note = Note(v.title.text.toString(), getDate(), getDrawableResource(v.view_pager.currentItem), v.view_pager.currentItem)
-            viewModel.addNoteToDatabase(note)
+            if (v.title.text.toString() == "") {
+                Toast.makeText(context, getText(R.string.empty_title), Toast.LENGTH_LONG).show()
+            } else {
+                (activity as BaseActivity).hideKeyboard()
+                val note = Note(v.title.text.toString(), getDate(), getDrawableResource(v.view_pager.currentItem), v.view_pager.currentItem)
+                viewModel.addNoteToDatabase(note)
+            }
         }
 
         return v
