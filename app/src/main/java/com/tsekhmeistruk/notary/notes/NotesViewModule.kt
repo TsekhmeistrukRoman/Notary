@@ -12,6 +12,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import java.util.*
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 /**
  * Created by Roman Tsekhmeistruk on 09.03.2018.
@@ -25,10 +26,24 @@ class NotesViewModule(private var notesRepository: NotesRepository) : ViewModel(
     private val liveDataItem = MutableLiveData<DataResource<Note>>()
     private val liveDataRemoved = MutableLiveData<DataResource<Note>>()
 
+    private var counter = 0 // variable for error when loading data from db emulating
+
     fun getAllNotes() {
         compositeDisposable.add(notesRepository.getAllNotes()
                 .doOnSubscribe { postValueList(DataResource.loading(null)) }
                 .delay(1500, TimeUnit.MILLISECONDS)
+                .map { list: List<Note> ->
+                    // Block of code for error simulation
+                    run {
+                        if (counter != 2) {
+                            counter++
+                        } else {
+                            counter = 0
+                            throw TimeoutException("Simulated error")
+                        }
+                    }
+                    list
+                }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ setValueList(DataResource.success(it)) },

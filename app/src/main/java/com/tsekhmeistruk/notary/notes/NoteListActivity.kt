@@ -99,6 +99,7 @@ class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener, Ad
                         hideLoadingIndicator()
                         Toast.makeText(applicationContext, getText(R.string.error), Toast.LENGTH_LONG).show()
                         listAdapter.clearList()
+                        swipe_container.isRefreshing = false
                     }
                     Status.SUCCESS -> {
                         hideLoadingIndicator()
