@@ -9,12 +9,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
 import com.tsekhmeistruk.notary.R
 import com.tsekhmeistruk.notary.data.Note
+import com.tsekhmeistruk.notary.widgets.Status
 import com.tsekhmeistruk.notary.widgets.util.BaseActivity
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
+import com.tsekhmeistruk.notary.widgets.util.DataResource
 import kotlinx.android.synthetic.main.fragment_add_edit.view.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -26,8 +26,18 @@ import javax.inject.Inject
 class AddEditNoteFragment : Fragment() {
 
     companion object {
+        private val passedNoteKey = "Note"
+
         fun newInstance(): AddEditNoteFragment {
             return AddEditNoteFragment()
+        }
+
+        fun newInstance(note: Note): AddEditNoteFragment {
+            val bundle = Bundle()
+            bundle.putSerializable(passedNoteKey, note)
+            val addEditFragment = AddEditNoteFragment()
+            addEditFragment.arguments = bundle
+            return addEditFragment
         }
     }
 
@@ -35,7 +45,7 @@ class AddEditNoteFragment : Fragment() {
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: AddEditNoteViewModel
 
-    private val disposable = CompositeDisposable()
+    private var passedNote: Note? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,19 +63,44 @@ class AddEditNoteFragment : Fragment() {
         v.back.setOnClickListener { activity.onBackPressed() }
         v.done.setOnClickListener {
             val note = Note(v.title.text.toString(), getDate(), getDrawableResource(v.view_pager.currentItem))
-            disposable.add(viewModel.addNoteToDatabase(note)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ activity.onBackPressed() }))
+            viewModel.addNoteToDatabase(note)
         }
 
         return v
+    }
+
+    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        if (arguments != null) {
+            passedNote = arguments.get(passedNoteKey) as Note
+            view?.remove?.visibility = View.VISIBLE
+            view?.remove?.setOnClickListener { viewModel.removeNoteFromDatabase(passedNote as Note) }
+            view?.done?.visibility = View.GONE
+            view?.title?.setText((passedNote as Note).title)
+            view?.view_pager?.currentItem = (passedNote as Note).colorResource
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(AddEditNoteViewModel::class.java)
+        viewModel.getLiveData().observe(this, android.arch.lifecycle.Observer<DataResource<Note>> { res ->
+            if (res != null) {
+                when (res.status) {
+                    Status.LOADING -> {
+
+                    }
+                    Status.ERROR -> {
+                        Toast.makeText(context, getText(R.string.error), Toast.LENGTH_LONG).show()
+                    }
+                    Status.SUCCESS -> {
+                        activity.onBackPressed()
+                    }
+                }
+            }
+        })
     }
 
     private fun getDrawableResource(pagerItemPosition: Int): Int {
