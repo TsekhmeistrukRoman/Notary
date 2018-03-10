@@ -13,6 +13,16 @@ import kotlinx.android.synthetic.main.item_note_layout.view.*
  */
 class NoteListAdapter(private val listener: OnNoteClickListener) : SimpleAdapter<Note, RecyclerView.ViewHolder>() {
 
+    fun findNotePosition(note: Note): Int {
+        list!!.forEach {
+            if (it.id == note.id) {
+                return list!!.indexOf(it)
+            }
+        }
+
+        return -1
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder {
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.item_note_layout, parent, false)
         return ViewHolder(view)

@@ -86,10 +86,10 @@ class AddEditNoteFragment : Fragment() {
         if (arguments != null) {
             if (arguments.getBoolean(passedNoteKey)) {
                 view?.remove?.visibility = View.VISIBLE
-                view?.remove?.setOnClickListener { viewModel.removeNoteFromDatabase((activity as NoteListActivity).choosedNote) }
+                view?.remove?.setOnClickListener { viewModel.removeNoteFromDatabase((activity as NoteListActivity).choosedNote!!) }
                 view?.done?.visibility = View.GONE
-                view?.title?.setText((activity as NoteListActivity).choosedNote.title)
-                view?.view_pager?.currentItem = (activity as NoteListActivity).choosedNote.pagerPosition
+                view?.title?.setText((activity as NoteListActivity).choosedNote!!.title)
+                view?.view_pager?.currentItem = (activity as NoteListActivity).choosedNote!!.pagerPosition
 
                 isNoteExistent = false
 
@@ -101,7 +101,7 @@ class AddEditNoteFragment : Fragment() {
                     }
 
                     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                        (activity as NoteListActivity).choosedNote.title = p0.toString()
+                        (activity as NoteListActivity).choosedNote!!.title = p0.toString()
                     }
                 })
 
@@ -113,8 +113,8 @@ class AddEditNoteFragment : Fragment() {
                     }
 
                     override fun onPageSelected(position: Int) {
-                        (activity as NoteListActivity).choosedNote.pagerPosition = position
-                        (activity as NoteListActivity).choosedNote.colorResource = getDrawableResource(position)
+                        (activity as NoteListActivity).choosedNote!!.pagerPosition = position
+                        (activity as NoteListActivity).choosedNote!!.colorResource = getDrawableResource(position)
                     }
                 })
             }

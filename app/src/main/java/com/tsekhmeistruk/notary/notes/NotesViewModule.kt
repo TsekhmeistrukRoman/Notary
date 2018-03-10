@@ -22,6 +22,7 @@ class NotesViewModule(private var notesRepository: NotesRepository) : ViewModel(
     private val compositeDisposable = CompositeDisposable()
     private val liveDataList = MutableLiveData<DataResource<List<Note>>>()
     private val liveDataItem = MutableLiveData<DataResource<Note>>()
+    private val liveDataRemoved = MutableLiveData<DataResource<Note>>()
 
     fun getAllNotes() {
         compositeDisposable.add(notesRepository.getAllNotes()
@@ -48,12 +49,34 @@ class NotesViewModule(private var notesRepository: NotesRepository) : ViewModel(
         }
     }
 
+    @MainThread
+    private fun setValueRemoved(newValue: DataResource<Note>) {
+        if (!Objects.equals(liveDataRemoved.value, newValue)) {
+            liveDataRemoved.value = newValue
+        }
+    }
+
     fun getLiveDataList(): MutableLiveData<DataResource<List<Note>>> {
         return liveDataList
     }
 
     fun getLiveDataItem(): MutableLiveData<DataResource<Note>> {
         return liveDataItem
+    }
+
+    fun getLiveDataRemoved(): MutableLiveData<DataResource<Note>> {
+        return liveDataRemoved
+    }
+
+    fun removeNoteFromDatabase(note: Note) {
+        compositeDisposable.add(notesRepository.removeNote(note.id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ setValueRemoved(DataResource.success(note)) },
+                        {
+                            Log.e(tag, it.message)
+                            setValueRemoved(DataResource.error(it, note))
+                        }))
     }
 
     fun updateNote(note: Note) {

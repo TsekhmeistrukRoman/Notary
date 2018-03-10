@@ -5,6 +5,8 @@ import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.widget.Toast
 import com.tsekhmeistruk.notary.R
 import com.tsekhmeistruk.notary.addeditnote.AddEditNoteFragment
@@ -24,7 +26,7 @@ class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener, Ad
 
     private lateinit var listAdapter: NoteListAdapter
 
-    lateinit var choosedNote: Note
+    var choosedNote: Note? = null
     private var choosedNotePosition: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,6 +41,9 @@ class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener, Ad
         note_list.layoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, false)
         note_list.itemAnimator = DefaultItemAnimator()
         note_list.adapter = listAdapter
+
+        val itemTouchHelper = ItemTouchHelper(createHelperCallback())
+        itemTouchHelper.attachToRecyclerView(note_list)
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(NotesViewModule::class.java)
         viewModel.getLiveDataList().observe(this, android.arch.lifecycle.Observer<DataResource<List<Note>>> { res ->
@@ -66,11 +71,30 @@ class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener, Ad
                     }
                     Status.ERROR -> {
                         Toast.makeText(applicationContext, getText(R.string.error), Toast.LENGTH_LONG).show()
-                        listAdapter.clearList()
                     }
                     Status.SUCCESS -> {
                         listAdapter.getItem(choosedNotePosition).update(res.data!!)
                         listAdapter.notifyItemChanged(choosedNotePosition)
+                        choosedNotePosition = -1
+                    }
+                }
+            }
+        })
+
+        viewModel.getLiveDataRemoved().observe(this, android.arch.lifecycle.Observer<DataResource<Note>> { res ->
+            if (res != null) {
+                when (res.status) {
+                    Status.LOADING -> {
+
+                    }
+                    Status.ERROR -> {
+                        Toast.makeText(applicationContext, getText(R.string.error), Toast.LENGTH_LONG).show()
+                    }
+                    Status.SUCCESS -> {
+                        val index = listAdapter.findNotePosition(res.data!!)
+                        if (index != -1) {
+                            listAdapter.removeItem(index)
+                        }
                     }
                 }
             }
@@ -84,8 +108,10 @@ class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener, Ad
 
         val count = supportFragmentManager.backStackEntryCount
         if (count != 0) {
-            if (choosedNote != listAdapter.getItem(choosedNotePosition)) {
-                viewModel.updateNote(choosedNote)
+            if (choosedNotePosition != -1) {
+                if (choosedNote != listAdapter.getItem(choosedNotePosition)) {
+                    viewModel.updateNote(choosedNote!!)
+                }
             }
         }
 
@@ -106,6 +132,22 @@ class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener, Ad
             }
         } else {
             listAdapter.removeItem(choosedNotePosition)
+        }
+    }
+
+    private fun createHelperCallback(): ItemTouchHelper.Callback {
+        return object : ItemTouchHelper.SimpleCallback(0,
+                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+
+            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
+                                target: RecyclerView.ViewHolder): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDir: Int) {
+                val position = viewHolder.adapterPosition
+                viewModel.removeNoteFromDatabase(listAdapter.getItem(position))
+            }
         }
     }
 }
