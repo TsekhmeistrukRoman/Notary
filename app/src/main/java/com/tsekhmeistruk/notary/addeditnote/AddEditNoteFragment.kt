@@ -6,6 +6,9 @@ import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.view.PagerAdapter
+import android.support.v4.view.ViewPager
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -89,6 +92,31 @@ class AddEditNoteFragment : Fragment() {
                 view?.view_pager?.currentItem = (activity as NoteListActivity).choosedNote.pagerPosition
 
                 isNoteExistent = false
+
+                view?.title?.addTextChangedListener(object : TextWatcher {
+                    override fun afterTextChanged(p0: Editable?) {
+                    }
+
+                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    }
+
+                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                        (activity as NoteListActivity).choosedNote.title = p0.toString()
+                    }
+                })
+
+                view?.view_pager?.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+                    override fun onPageScrollStateChanged(state: Int) {
+                    }
+
+                    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                    }
+
+                    override fun onPageSelected(position: Int) {
+                        (activity as NoteListActivity).choosedNote.pagerPosition = position
+                        (activity as NoteListActivity).choosedNote.colorResource = getDrawableResource(position)
+                    }
+                })
             }
         }
     }

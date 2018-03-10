@@ -16,6 +16,15 @@ class Note constructor(
         @ColumnInfo(name = "pagerPosition") var pagerPosition: Int = 0,
         @PrimaryKey @ColumnInfo(name = "entryid") var id: String = UUID.randomUUID().toString()) : BaseEntity() {
 
+    fun copy() = Note(title, date, colorResource, pagerPosition, id)
+
+    fun update(note: Note) {
+        title = note.title
+        date = note.date
+        colorResource = note.colorResource
+        pagerPosition = note.pagerPosition
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

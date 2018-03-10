@@ -20,28 +20,51 @@ class NotesViewModule(private var notesRepository: NotesRepository) : ViewModel(
     private val tag = "NotesViewModule"
 
     private val compositeDisposable = CompositeDisposable()
-    private val liveData = MutableLiveData<DataResource<List<Note>>>()
+    private val liveDataList = MutableLiveData<DataResource<List<Note>>>()
+    private val liveDataItem = MutableLiveData<DataResource<Note>>()
 
     fun getAllNotes() {
         compositeDisposable.add(notesRepository.getAllNotes()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ setValue(DataResource.success(it)) },
+                .subscribe({ setValueList(DataResource.success(it)) },
                         {
                             Log.e(tag, it.message)
-                            setValue(DataResource.error(it, null))
+                            setValueList(DataResource.error(it, null))
                         }))
     }
 
     @MainThread
-    private fun setValue(newValue: DataResource<List<Note>>) {
-        if (!Objects.equals(liveData.value, newValue)) {
-            liveData.value = newValue
+    private fun setValueList(newValue: DataResource<List<Note>>) {
+        if (!Objects.equals(liveDataList.value, newValue)) {
+            liveDataList.value = newValue
         }
     }
 
-    fun getLiveData(): MutableLiveData<DataResource<List<Note>>> {
-        return liveData
+    @MainThread
+    private fun setValueItem(newValue: DataResource<Note>) {
+        if (!Objects.equals(liveDataList.value, newValue)) {
+            liveDataItem.value = newValue
+        }
+    }
+
+    fun getLiveDataList(): MutableLiveData<DataResource<List<Note>>> {
+        return liveDataList
+    }
+
+    fun getLiveDataItem(): MutableLiveData<DataResource<Note>> {
+        return liveDataItem
+    }
+
+    fun updateNote(note: Note) {
+        compositeDisposable.add(notesRepository.updateNote(note)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ setValueItem(DataResource.success(note)) },
+                        {
+                            Log.e(tag, it.message)
+                            setValueItem(DataResource.error(it, null))
+                        }))
     }
 
     override fun onCleared() {

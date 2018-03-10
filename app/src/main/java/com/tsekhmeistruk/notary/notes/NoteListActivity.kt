@@ -41,7 +41,7 @@ class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener, Ad
         note_list.adapter = listAdapter
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(NotesViewModule::class.java)
-        viewModel.getLiveData().observe(this, android.arch.lifecycle.Observer<DataResource<List<Note>>> { res ->
+        viewModel.getLiveDataList().observe(this, android.arch.lifecycle.Observer<DataResource<List<Note>>> { res ->
             if (res != null) {
                 when (res.status) {
                     Status.LOADING -> {
@@ -58,11 +58,42 @@ class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener, Ad
             }
         })
 
+        viewModel.getLiveDataItem().observe(this, android.arch.lifecycle.Observer<DataResource<Note>> { res ->
+            if (res != null) {
+                when (res.status) {
+                    Status.LOADING -> {
+
+                    }
+                    Status.ERROR -> {
+                        Toast.makeText(applicationContext, getText(R.string.error), Toast.LENGTH_LONG).show()
+                        listAdapter.clearList()
+                    }
+                    Status.SUCCESS -> {
+                        listAdapter.getItem(choosedNotePosition).update(res.data!!)
+                        listAdapter.notifyItemChanged(choosedNotePosition)
+                    }
+                }
+            }
+        })
+
         viewModel.getAllNotes()
     }
 
+    override fun onBackPressed() {
+        hideKeyboard()
+
+        val count = supportFragmentManager.backStackEntryCount
+        if (count != 0) {
+            if (choosedNote != listAdapter.getItem(choosedNotePosition)) {
+                viewModel.updateNote(choosedNote)
+            }
+        }
+
+        super.onBackPressed()
+    }
+
     override fun onNoteClick(position: Int) {
-        choosedNote = listAdapter.getItem(position)
+        choosedNote = listAdapter.getItem(position).copy()
         choosedNotePosition = position
 
         startFragment(AddEditNoteFragment.newInstance(true), true)

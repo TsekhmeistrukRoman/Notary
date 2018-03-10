@@ -9,17 +9,17 @@ import java.util.*
  */
 abstract class SimpleAdapter<T : BaseEntity, VH : RecyclerView.ViewHolder> : RecyclerView.Adapter<VH>() {
 
-    private var mList: MutableList<T>? = null
+    var list: MutableList<T>? = null
 
     val data: List<T>?
-        get() = mList
+        get() = list
 
     override fun getItemCount(): Int {
-        return if (mList != null) mList!!.size else 0
+        return if (list != null) list!!.size else 0
     }
 
     fun getItem(i: Int): T {
-        return mList!![i]
+        return list!![i]
     }
 
     override fun getItemId(i: Int): Long {
@@ -27,28 +27,28 @@ abstract class SimpleAdapter<T : BaseEntity, VH : RecyclerView.ViewHolder> : Rec
     }
 
     fun add(vararg items: T) {
-        if (mList == null) mList = ArrayList(items.size)
-        Collections.addAll(mList!!, *items)
+        if (list == null) list = ArrayList(items.size)
+        Collections.addAll(list!!, *items)
         notifyDataSetChanged()
     }
 
     fun add(items: List<T>) {
-        if (mList == null) mList = ArrayList(items.size)
-        mList!!.addAll(items)
+        if (list == null) list = ArrayList(items.size)
+        list!!.addAll(items)
         notifyDataSetChanged()
     }
 
     fun removeItem(position: Int) {
-        if (mList != null) {
-            mList!!.removeAt(position)
+        if (list != null) {
+            list!!.removeAt(position)
             notifyItemRemoved(position)
-            notifyItemRangeChanged(position, mList!!.size)
+            notifyItemRangeChanged(position, list!!.size)
         }
     }
 
     fun clearList() {
-        if (mList != null) {
-            mList!!.clear()
+        if (list != null) {
+            list!!.clear()
         }
         notifyDataSetChanged()
     }
