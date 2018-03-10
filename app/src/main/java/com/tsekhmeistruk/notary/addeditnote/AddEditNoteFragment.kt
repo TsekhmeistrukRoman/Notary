@@ -62,7 +62,7 @@ class AddEditNoteFragment : Fragment() {
         v.page_indicator.setViewPager(v.view_pager)
         v.back.setOnClickListener { activity.onBackPressed() }
         v.done.setOnClickListener {
-            val note = Note(v.title.text.toString(), getDate(), getDrawableResource(v.view_pager.currentItem))
+            val note = Note(v.title.text.toString(), getDate(), getDrawableResource(v.view_pager.currentItem), v.view_pager.currentItem)
             viewModel.addNoteToDatabase(note)
         }
 
@@ -78,7 +78,7 @@ class AddEditNoteFragment : Fragment() {
             view?.remove?.setOnClickListener { viewModel.removeNoteFromDatabase(passedNote as Note) }
             view?.done?.visibility = View.GONE
             view?.title?.setText((passedNote as Note).title)
-            view?.view_pager?.currentItem = (passedNote as Note).colorResource
+            view?.view_pager?.currentItem = (passedNote as Note).pagerPosition
         }
     }
 
