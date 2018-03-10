@@ -59,7 +59,11 @@ class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener, Ad
         if (count != 0) {
             if (choosedNotePosition != -1) {
                 if (choosedNote != listAdapter.getItem(choosedNotePosition)) {
-                    viewModel.updateNote(choosedNote!!)
+                    if (choosedNote!!.title.isNotEmpty()) {
+                        viewModel.updateNote(choosedNote!!)
+                    } else {
+                        viewModel.removeNoteFromDatabase(choosedNote!!)
+                    }
                 }
             }
         }
@@ -117,6 +121,7 @@ class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener, Ad
                         listAdapter.getItem(choosedNotePosition).update(res.data!!)
                         listAdapter.notifyItemChanged(choosedNotePosition)
                         choosedNotePosition = -1
+                        choosedNote = null
                     }
                 }
             }
@@ -136,6 +141,8 @@ class NoteListActivity : BaseActivity(), NoteListAdapter.OnNoteClickListener, Ad
                         if (index != -1) {
                             listAdapter.removeItem(index)
                         }
+                        choosedNotePosition = -1
+                        choosedNote = null
                     }
                 }
             }
