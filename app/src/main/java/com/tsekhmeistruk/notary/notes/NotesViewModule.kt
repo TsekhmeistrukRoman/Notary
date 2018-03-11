@@ -1,14 +1,13 @@
 package com.tsekhmeistruk.notary.notes
 
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import android.support.annotation.MainThread
 import android.util.Log
 import com.tsekhmeistruk.notary.data.Note
 import com.tsekhmeistruk.notary.data.source.NotesRepository
+import com.tsekhmeistruk.notary.widgets.util.BaseViewModel
 import com.tsekhmeistruk.notary.widgets.util.DataResource
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -17,11 +16,10 @@ import java.util.concurrent.TimeoutException
 /**
  * Created by Roman Tsekhmeistruk on 09.03.2018.
  */
-class NotesViewModule(private var notesRepository: NotesRepository) : ViewModel() {
+class NotesViewModule(private var notesRepository: NotesRepository) : BaseViewModel() {
 
     private val tag = "NotesViewModule"
 
-    private val compositeDisposable = CompositeDisposable()
     private val liveDataList = MutableLiveData<DataResource<List<Note>>>()
     private val liveDataItem = MutableLiveData<DataResource<Note>>()
     private val liveDataRemoved = MutableLiveData<DataResource<Note>>()
@@ -29,7 +27,7 @@ class NotesViewModule(private var notesRepository: NotesRepository) : ViewModel(
     private var counter = 0 // variable for error when loading data from db emulating
 
     fun getAllNotes() {
-        compositeDisposable.add(notesRepository.getAllNotes()
+        addDisposable(notesRepository.getAllNotes()
                 .doOnSubscribe { postValueList(DataResource.loading(null)) }
                 .delay(1500, TimeUnit.MILLISECONDS)
                 .map { list: List<Note> ->
@@ -97,7 +95,7 @@ class NotesViewModule(private var notesRepository: NotesRepository) : ViewModel(
     }
 
     fun removeNoteFromDatabase(note: Note) {
-        compositeDisposable.add(notesRepository.removeNote(note.id)
+        addDisposable(notesRepository.removeNote(note.id)
                 .doOnSubscribe { postValueRemoved(DataResource.loading(null)) }
                 .delay(1500, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
@@ -110,7 +108,7 @@ class NotesViewModule(private var notesRepository: NotesRepository) : ViewModel(
     }
 
     fun updateNote(note: Note) {
-        compositeDisposable.add(notesRepository.updateNote(note)
+        addDisposable(notesRepository.updateNote(note)
                 .doOnSubscribe { postValueItem(DataResource.loading(null)) }
                 .delay(1500, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
@@ -120,10 +118,5 @@ class NotesViewModule(private var notesRepository: NotesRepository) : ViewModel(
                             Log.e(tag, it.message)
                             setValueItem(DataResource.error(it, null))
                         }))
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        compositeDisposable.dispose()
     }
 }
